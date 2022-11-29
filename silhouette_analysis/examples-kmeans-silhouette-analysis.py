@@ -58,7 +58,7 @@ for n_clusters in range_n_clusters:
         )
 
     # 对每个样本计算silhouette scores
-    sample_silhouette_values = silhoutte_samples(X,cluster_labels)
+    sample_silhouette_values = silhoutte_samples(X, cluster_labels)
 
     y_lower = 10
     for i in range(n_clusters):
@@ -80,7 +80,15 @@ for n_clusters in range_n_clusters:
             alpha=0.7,
         )
 
-        ax1.text(-0.05, y_lower + 0.5 *size_cluster_i, str(i))
+        # 标记轮廓图
+        ax1.text(-0.05, y_lower + 0.5 * size_cluster_i, str(i))
+
+        # Compute the new y_lower for next plot
+        y_lower = y_upper + 10
+    ax1.set_title("The silhouette plot for the various clusters.")
+    ax1.set_xlabel("The silhouette coefficient values")
+    ax1.set_ylabel("Cluster label")
+
 
 
 

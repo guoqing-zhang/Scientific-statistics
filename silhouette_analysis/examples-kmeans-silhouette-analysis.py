@@ -6,7 +6,7 @@ Created on Tue Nov 29 21:33:17 2022
 """
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhoutte_samples, silhoutte_score
+from sklearn.metrics import silhouette_samples, silhouette_score
 
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -24,8 +24,8 @@ parameters like number of clusters visually. This measure has a range of [-1, 1]
 # This particular setting has one distinct cluster and 3 clusters placed close
 # together.
 X, y = make_blobs(
-    n_samples=500,
-    n_features=2,
+    n_samples=500,  # 500样本
+    n_features=2,  # 每个样本包含的特征
     centers=4,
     cluster_std=1,
     center_box=(-10.0, 10.0),
@@ -46,19 +46,21 @@ for n_clusters in range_n_clusters:
     ax1.set_xlim([-0.1, 1])
     ax1.set_ylim([0, len(X) + (n_clusters+1)*10])  # 添加y轴空白
 
+    # Initialize the clusterer with n_clusters value and a random generator
     clusterer = KMeans(n_clusters=n_clusters, random_state=10)  # seed = 10
     cluster_labels = clusterer.fit_predict(X)
-    #
-    silhouette_avg=silhoutte_score(X, cluster_labels)
+
+    # silhouette te_score给出了所有样本的平均值。
+    silhouette_avg = silhouette_score(X, cluster_labels)
     print(
         "For n_clusters =",
         n_clusters,
         "The average siljouette_score is :",
         silhouette_avg,
-        )
+    )
 
     # 对每个样本计算silhouette scores
-    sample_silhouette_values = silhoutte_samples(X, cluster_labels)
+    sample_silhouette_values = silhouette_samples(X, cluster_labels)
 
     y_lower = 10
     for i in range(n_clusters):
@@ -89,11 +91,43 @@ for n_clusters in range_n_clusters:
     ax1.set_xlabel("The silhouette coefficient values")
     ax1.set_ylabel("Cluster label")
 
+    # 垂直线表示所有值的平均轮廓得分
+    ax1.axvline(x=silhouette_avg, color="red", linestyle="--")
 
+    ax1.set_yticks([])  # Clear the yaxis labels/ticks
+    ax1.set_xticks([-0.1, 0, 0.2, 0.4, 0.6, 0.8, 1])
 
+    # 2nd Plot showing the actual clusters formed
+    colors = cm.nipy_spectral(cluster_labels.astype(float) / n_clusters)
+    ax2.scatter(
+        X[:, 0], X[:, 1], marker=".", s=30, lw=0, alpha=0.7, c=colors, edgecolor="k"
+    )
 
+    # Labeling the clusters
+    centers = clusterer.cluster_centers_
+    # Draw white citcles at cluster centers
+    ax2.scatter(
+        centers[:, 0],
+        centers[:, 1],
+        marker="o",
+        c="white",
+        alpha=1,
+        s=200,
+        edgecolor="k",
+    )
+    for i, c in enumerate(centers):
+        ax2.scatter(c[0], c[1], marker="$%d$" %
+                    i, alpha=1, s=50, edgecolor="k")
 
+    ax2.set_title("The visualization of the clustered data.")
+    ax2.set_xlabel("Feature space for the 1st feature")
+    ax2.set_ylabel("Feature space for the 2nd feature")
 
+    plt.suptitle(
+        "Silhouette analysis for KMeans clustering on sample data with n_clusters = %d"
+        % n_clusters,
+        fontsize=14,
+        fontweight="bold",
+    )
 
-
-
+plt.show()
